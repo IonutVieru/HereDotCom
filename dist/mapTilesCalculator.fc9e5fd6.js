@@ -117,74 +117,51 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
-var bundleURL = null;
+})({"mapTilesCalculator.js":[function(require,module,exports) {
+//Calculating the map tiles
+var lat = 55.703934,
+    // Latitude
+lon = 12.485140,
+    // Longitude
+z = 13,
+    // Zoom level
+latRad,
+    n,
+    xTile,
+    yTile;
+latRad = lat * Math.PI / 180;
+n = Math.pow(2, z);
+xTile = n * ((lon + 180) / 360);
+yTile = n * (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2;
+console.log("zoom level=" + z);
+console.log("X tile coord= " + xTile);
+console.log("Y tile coord=" + yTile);
 
-function getBundleURLCached() {
-  if (!bundleURL) {
-    bundleURL = getBundleURL();
-  }
+function tileXYToQuadKey(xTile, yTile, z) {
+  var quadKey = "";
 
-  return bundleURL;
-}
+  for (var i = z; i > 0; i--) {
+    var digit = "0",
+        mask = 1 << i - 1;
 
-function getBundleURL() {
-  // Attempt to find the URL of the current script and use that as the base URL
-  try {
-    throw new Error();
-  } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
-
-    if (matches) {
-      return getBaseURL(matches[0]);
-    }
-  }
-
-  return '/';
-}
-
-function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
-}
-
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-},{}],"node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
-var bundle = require('./bundle-url');
-
-function updateLink(link) {
-  var newLink = link.cloneNode();
-
-  newLink.onload = function () {
-    link.remove();
-  };
-
-  newLink.href = link.href.split('?')[0] + '?' + Date.now();
-  link.parentNode.insertBefore(newLink, link.nextSibling);
-}
-
-var cssTimeout = null;
-
-function reloadCSS() {
-  if (cssTimeout) {
-    return;
-  }
-
-  cssTimeout = setTimeout(function () {
-    var links = document.querySelectorAll('link[rel="stylesheet"]');
-
-    for (var i = 0; i < links.length; i++) {
-      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
-        updateLink(links[i]);
-      }
+    if ((xTile & mask) != 0) {
+      digit++;
     }
 
-    cssTimeout = null;
-  }, 50);
+    if ((yTile & mask) != 0) {
+      digit = digit + 2;
+    }
+
+    quadKey += digit;
+  } // for i return quadKey; 
+
+
+  console.log("Quadkey=" + quadKey);
+  return quadKey;
 }
 
-module.exports = reloadCSS;
-},{"./bundle-url":"node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+tileXYToQuadKey(xTile, yTile, z);
+},{}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -388,5 +365,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js"], null)
-//# sourceMappingURL=/index.js.map
+},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js","mapTilesCalculator.js"], null)
+//# sourceMappingURL=/mapTilesCalculator.fc9e5fd6.js.map
